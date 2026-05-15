@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LJA x Glean</title>
+  <style>
+    :root {
+      --text-main: #f8fafc;
+      --text-muted: #b8c3d9;
+      --accent-soft: #8adcf0;
+      --accent-2: #ffd4a3;
+      --card-bg: rgba(11, 17, 34, 0.82);
+      --border-soft: rgba(148, 163, 255, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #1a2850 0, #050816 45%, #02010b 100%);
+      color: var(--text-main);
+    }
+
+    a {
+      color: var(--accent-soft);
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 32px auto;
+      padding: 24px 20px 40px;
+    }
+
+    .shell {
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.08) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(77,208,225,0.18) 0, transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(10,15,35,0.98));
+      padding: 1px;
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(148,163,255,0.12);
+    }
+
+    .inner {
+      border-radius: 23px;
+      background: radial-gradient(circle at top, #0a0f23 0, #050816 55%, #02010b 100%);
+      padding: 28px 28px 32px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.3fr);
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 3vw, 34px);
+      letter-spacing: 0.03em;
+      line-height: 1.15;
+    }
+
+    .hero-title-gradient {
+      background: linear-gradient(110deg, #ffffff, #ffd4a3, #4dd0e1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,255,0.35);
+      background: rgba(15,23,42,0.9);
+      color: var(--accent-soft);
+      white-space: nowrap;
+    }
+
+    .metric-card {
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.08) 0, transparent 55%), linear-gradient(145deg, #050816, #0d1228);
+      border: 1px solid rgba(148,163,255,0.3);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.7);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .metric-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .metric-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      margin: 22px 0 18px;
+      border: 0;
+      border-top: 1px solid rgba(148,163,255,0.25);
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 2.2fr) minmax(0, 2.1fr);
+      gap: 18px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .card {
+      border-radius: 16px;
+      padding: 12px 13px 11px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+    }
+
+    .card h3,
+    .ref-card h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .card p,
+    .ref-card p {
+      margin: 0 0 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .card ul,
+    .ref-card ul {
+      padding-left: 16px;
+      margin: 6px 0 0;
+    }
+
+    .card li,
+    .ref-card li {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.45;
+    }
+
+    .accent {
+      color: var(--accent-soft);
+    }
+
+    .usecases {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .usecase-card {
+      border-radius: 14px;
+      padding: 10px 10px 9px;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.07) 0, rgba(5,8,22,0.98) 52%);
+      border: 1px solid rgba(148,163,255,0.4);
+    }
+
+    .usecase-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-2);
+      margin-bottom: 3px;
+    }
+
+    .usecase-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .usecase-card ul {
+      margin: 4px 0 0;
+      padding-left: 14px;
+    }
+
+    .usecase-card li {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.45;
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 2.2fr) minmax(0, 2fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .ref-card {
+      border-radius: 14px;
+      padding: 10px 11px 9px;
+      background: #050816;
+      border: 1px solid rgba(148,163,255,0.35);
+    }
+
+    .ref-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 10px;
+      color: var(--text-muted);
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .section-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .usecases {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .ref-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 12px auto;
+        padding: 12px;
+      }
+
+      .inner {
+        padding: 20px 16px 22px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .usecases {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <div class="shell">
+      <div class="inner">
+        <div class="hero">
+          <div>
+            <h1>
+              Supercharge <span class="hero-title-gradient">utilization, M&amp;A integration, and AI impact</span> at LJA.
+            </h1>
+            <p class="hero-sub">
+              LJA is an employee-owned, multi-disciplinary firm with ~2,000 employees across eight sectors and 25+ acquisitions in the last two years — but knowledge lives in too many places, Copilot hasn’t delivered, and utilization is stuck near ~70%.
+            </p>
+            <div class="pill-row">
+              <span class="pill">Lift utilization 3–5 pts by shrinking search tax and rework</span>
+              <span 

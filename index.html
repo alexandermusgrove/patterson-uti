@@ -63,26 +63,46 @@
 
     .logos-row {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 28px 8px 20px 8px;
+      align-items: flex-end;
+      gap: 18px;
+      padding: 28px 18px 20px 18px;
     }
 
-    .logos-row img {
-      display: block;
-      height: 46px;
-      width: auto;
-      object-fit: contain;
-      object-position: left center;
+    .logo-wrap {
+      height: 42px;
+      display: flex;
+      align-items: flex-end;
       flex: 0 0 auto;
     }
 
+    .logo-wrap img {
+      display: block;
+      width: auto;
+      max-height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+    }
+
+    .logo-patterson {
+      height: 42px;
+    }
+
+    .logo-glean {
+      height: 39px;
+      transform: translateY(0);
+    }
+
     .logos-row .divider {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
       font-size: 28px;
       line-height: 1;
       color: #2b2b2b;
       font-weight: 500;
-      transform: translateY(-1px);
+      padding-bottom: 2px;
+      flex: 0 0 auto;
     }
 
     .hero {
@@ -509,9 +529,13 @@
 <body>
   <main class="page">
     <div class="logos-row" aria-label="Patterson-UTI and Glean logos">
-      <img src="Patterson.png" alt="Patterson-UTI logo" />
+      <div class="logo-wrap logo-wrap-patterson">
+        <img class="logo-patterson" src="Patterson.png" alt="Patterson-UTI logo" />
+      </div>
       <span class="divider" aria-hidden="true">+</span>
-      <img src="glean-logo.png" alt="Glean logo" />
+      <div class="logo-wrap logo-wrap-glean">
+        <img class="logo-glean" src="glean-logo.png" alt="Glean logo" />
+      </div>
     </div>
 
     <section class="hero">
@@ -575,10 +599,10 @@
       <p class="section-intro">Patterson-UTI is facing a common enterprise AI challenge: demand is established, but usage is fragmented across sanctioned tools, limited-license environments, and shadow AI behaviors.</p>
 
       <div class="why-grid">
-        <article class="why-card open">
-          <button class="accordion-toggle" type="button" aria-expanded="true">
+        <article class="why-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
             <h3 class="why-title">Standardize AI Usage</h3>
-            <span class="accordion-icon" aria-hidden="true">−</span>
+            <span class="accordion-icon" aria-hidden="true">+</span>
           </button>
           <div class="accordion-body">
             <div class="accordion-body-inner">
@@ -639,10 +663,10 @@
       <p class="section-intro">Compact cards by function, with the detailed bullets hidden until expanded.</p>
 
       <div class="dept-grid">
-        <article class="dept-card open">
-          <button class="accordion-toggle" type="button" aria-expanded="true">
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
             <h3 class="dept-title">Supply chain / procurement</h3>
-            <span class="accordion-icon" aria-hidden="true">−</span>
+            <span class="accordion-icon" aria-hidden="true">+</span>
           </button>
           <div class="accordion-body">
             <div class="accordion-body-inner">
@@ -760,6 +784,9 @@
     document.querySelectorAll('.why-card, .dept-card').forEach(function(card) {
       const button = card.querySelector('.accordion-toggle');
       const icon = card.querySelector('.accordion-icon');
+      card.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+      icon.textContent = '+';
       button.addEventListener('click', function() {
         const isOpen = card.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
@@ -782,4 +809,3 @@
   </script>
 </body>
 </html>
-

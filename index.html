@@ -1,1 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glean for Patterson-UTI</title>
+  <style>
+    :root {
+      --bg: #f4f0ec;
+      --shell: #fffdfb;
+      --panel: #ffffff;
+      --ink: #111111;
+      --muted: #525252;
+      --muted-soft: #6b6b6b;
+      --line: rgba(17,17,17,0.08);
+      --line-strong: rgba(17,17,17,0.12);
+      --red: #d7373f;
+      --red-soft: rgba(215, 55, 63, 0.14);
+      --dark: #171717;
+      --dark-card: linear-gradient(180deg, #262626 0%, #1e1e1e 100%);
+      --shadow: 0 22px 60px rgba(24, 24, 24, 0.10);
+      --radius-shell: 36px;
+      --radius-xl: 28px;
+      --radius-lg: 24px;
+      --radius-md: 20px;
+      --radius-sm: 16px;
+      --container: 1760px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, rgba(215,55,63,0.05), transparent 28%), var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.42;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .page {
+      width: min(calc(100% - 24px), var(--container));
+      margin: 14px auto 40px;
+      padding: 18px 20px 34px;
+      background: linear-gradient(180deg, rgba(255,248,246,0.95) 0%, rgba(255,255,255,0.98) 160px, var(--shell) 100%);
+      border: 1px solid rgba(215,55,63,0.10);
+      border-radius: var(--radius-shell);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--red);
+    }
+
+    .logos-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 28px 8px 20px 8px;
+    }
+
+    .logos-row img {
+      display: block;
+      height: 46px;
+      width: auto;
+      object-fit: contain;
+      object-position: left center;
+      flex: 0 0 auto;
+    }
+
+    .logos-row .divider {
+      font-size: 28px;
+      line-height: 1;
+      color: #2b2b2b;
+      font-weight: 500;
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.95fr);
+      gap: 34px;
+      align-items: start;
+      padding: 4px 18px 0;
+    }
+
+    .hero-copy h1 {
+      margin: 0;
+      max-width: 880px;
+      font-size: clamp(52px, 6vw, 94px);
+      line-height: 0.92;
+      letter-spacing: -0.05em;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero-rule {
+      width: 94px;
+      height: 8px;
+      margin: 26px 0 22px;
+      background: var(--red);
+      border-radius: 999px;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 920px;
+      font-size: clamp(20px, 1.9vw, 28px);
+      line-height: 1.35;
+      color: #2f2f2f;
+      letter-spacing: -0.02em;
+    }
+
+    .highlight {
+      background: var(--dark);
+      color: #ffffff;
+      border-radius: 34px;
+      padding: 28px 24px 22px;
+      box-shadow: 0 22px 48px rgba(0,0,0,0.16);
+    }
+
+    .section-label {
+      margin: 0 0 16px;
+      font-size: 17px;
+      letter-spacing: 0.18em;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .highlight-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .highlight-item {
+      background: var(--dark-card);
+      border-radius: 24px;
+      padding: 24px 22px 22px 26px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-left: 5px solid var(--red);
+      min-height: 160px;
+    }
+
+    .highlight-item .num {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .highlight-item p {
+      margin: 0;
+      font-size: clamp(18px, 1.5vw, 22px);
+      line-height: 1.4;
+      color: rgba(255,255,255,0.96);
+      letter-spacing: -0.02em;
+    }
+
+    .stories {
+      margin: 34px 6px 0;
+      background: var(--dark);
+      color: #ffffff;
+      border-radius: 34px;
+      padding: 28px 26px 28px;
+      box-shadow: 0 24px 54px rgba(0,0,0,0.14);
+    }
+
+    .stories-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .stories-head .left,
+    .stories-head .right {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.16em;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .stories-head .right {
+      color: rgba(255,255,255,0.62);
+      text-align: right;
+    }
+
+    .stories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .story-card {
+      background: var(--dark-card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 26px;
+      padding: 24px 24px 22px;
+      min-height: 100%;
+    }
+
+    .story-eyebrow {
+      display: block;
+      margin-bottom: 16px;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .story-card h3 {
+      margin: 0 0 16px;
+      font-size: clamp(26px, 2vw, 34px);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .story-card p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.86);
+    }
+
+    .section-shell {
+      margin: 32px 6px 0;
+      padding: 34px 34px 30px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+      border-radius: 34px;
+      border: 1px solid rgba(215,55,63,0.08);
+      box-shadow: 0 16px 38px rgba(18,18,18,0.06);
+    }
+
+    .eyebrow-red {
+      margin: 0 0 10px;
+      color: var(--red);
+      font-size: 16px;
+      letter-spacing: 0.17em;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .section-shell h2 {
+      margin: 0;
+      font-size: clamp(40px, 4vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .section-intro {
+      margin: 14px 0 0;
+      max-width: 1120px;
+      font-size: 18px;
+      line-height: 1.45;
+      color: #404040;
+    }
+
+    .why-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .why-card,
+    .dept-card {
+      background: #fff;
+      border: 1px solid rgba(215,55,63,0.14);
+      border-radius: 24px;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .why-card:hover,
+    .dept-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(26,26,26,0.06);
+      border-color: rgba(215,55,63,0.22);
+    }
+
+    .accordion-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      padding: 24px 24px 22px;
+      font: inherit;
+    }
+
+    .why-card .accordion-toggle {
+      min-height: 122px;
+      align-items: flex-start;
+    }
+
+    .why-title,
+    .dept-title {
+      margin: 0;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.02;
+      text-transform: uppercase;
+      color: #171717;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .why-title {
+      font-size: clamp(24px, 2vw, 34px);
+    }
+
+    .dept-title {
+      font-size: clamp(24px, 1.7vw, 31px);
+      letter-spacing: -0.045em;
+      text-transform: none;
+    }
+
+    .accordion-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(215,55,63,0.26);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--red);
+      font-size: 28px;
+      line-height: 1;
+      flex: 0 0 auto;
+      transform: translateY(1px);
+      background: rgba(215,55,63,0.04);
+    }
+
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.24s ease;
+    }
+
+    .accordion-body-inner {
+      overflow: hidden;
+    }
+
+    .why-card.open .accordion-body,
+    .dept-card.open .accordion-body {
+      grid-template-rows: 1fr;
+    }
+
+    .why-content,
+    .dept-content {
+      padding: 0 24px 24px;
+      color: #2f2f2f;
+      font-size: 18px;
+      line-height: 1.52;
+    }
+
+    .why-content p {
+      margin: 0;
+    }
+
+    .why-card.open .accordion-icon,
+    .dept-card.open .accordion-icon {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+
+    .dept-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .dept-card .accordion-toggle {
+      min-height: 110px;
+      align-items: flex-start;
+      padding: 22px 22px 20px;
+    }
+
+    .dept-card .accordion-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 26px;
+      margin-left: 8px;
+    }
+
+    .dept-card .accordion-body {
+      border-top: 1px solid rgba(17,17,17,0.07);
+    }
+
+    .dept-content {
+      padding-top: 18px;
+    }
+
+    .dept-content ul {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    .dept-content li {
+      margin: 0 0 12px;
+    }
+
+    .dept-content li:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 1380px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .highlight {
+        max-width: 980px;
+      }
+      .stories-grid,
+      .dept-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .page {
+        width: min(calc(100% - 16px), var(--container));
+        padding: 16px 14px 24px;
+        border-radius: 28px;
+      }
+      .logos-row {
+        padding-inline: 4px;
+        gap: 12px;
+      }
+      .logos-row img {
+        height: 34px;
+      }
+      .logos-row .divider {
+        font-size: 22px;
+      }
+      .hero,
+      .section-shell {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      .stories,
+      .section-shell {
+        border-radius: 26px;
+      }
+      .stories-grid,
+      .why-grid,
+      .dept-grid {
+        grid-template-columns: 1fr;
+      }
+      .stories-head {
+        grid-template-columns: 1fr;
+      }
+      .stories-head .right {
+        text-align: left;
+      }
+      .story-card h3 {
+        font-size: 30px;
+      }
+      .why-content,
+      .dept-content,
+      .hero-copy p,
+      .highlight-item p {
+        font-size: 17px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .page {
+        width: 100%;
+        margin: 0;
+        box-shadow: none;
+        border: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="logos-row" aria-label="Patterson-UTI and Glean logos">
+      <img src="Patterson.png" alt="Patterson-UTI logo" />
+      <span class="divider" aria-hidden="true">+</span>
+      <img src="glean-logo.png" alt="Glean logo" />
+    </div>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>A Governed AI Layer for Patterson-UTI</h1>
+        <div class="hero-rule"></div>
+        <p>One trusted foundation for search, assistant, and agents across field and office work — without forcing a rip-and-replace of existing systems or current AI investments.</p>
+      </div>
+
+      <aside class="highlight" aria-label="Highlight box">
+        <p class="section-label">Highlight Box</p>
+        <div class="highlight-list">
+          <div class="highlight-item">
+            <span class="num">01</span>
+            <p>Unify knowledge across field and office systems so people can find the right SOP, rig history, safety procedure, contract language, or prior project context without hunting across disconnected tools.</p>
+          </div>
+          <div class="highlight-item">
+            <span class="num">02</span>
+            <p>Replace fragmented AI usage with a secure, permission-aware approach that gives employees better everyday AI while giving IT stronger governance, guardrails, and control.</p>
+          </div>
+          <div class="highlight-item">
+            <span class="num">03</span>
+            <p>Give the company and IT one trusted foundation for search, assistant, and agents without forcing a rip-and-replace of existing systems or current AI investments.</p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="stories" aria-label="Customer success stories">
+      <div class="stories-head">
+        <p class="left">Customer Success Stories</p>
+        <p class="right">Relevant Enterprise Proof Points</p>
+      </div>
+      <div class="stories-grid">
+        <article class="story-card">
+          <span class="story-eyebrow">ConocoPhillips</span>
+          <h3>$33M Year-1 Impact Across 8k Employees</h3>
+          <p>ConocoPhillips used Glean to replace a fragmented enterprise search experience with one secure, company-wide search and assistant layer, with expansion planned into field and technical teams.</p>
+        </article>
+        <article class="story-card">
+          <span class="story-eyebrow">Urban Oil &amp; Gas</span>
+          <h3>6+ Months of Work Saved per Large Acquisition</h3>
+          <p>Urban used Glean to make decades of acquired well data, including scanned PDFs and legacy records, usable for technical teams by turning months of manual work into minutes or hours.</p>
+        </article>
+        <article class="story-card">
+          <span class="story-eyebrow">Diamondback Energy</span>
+          <h3>AI-Enabled Field and Technical Teams</h3>
+          <p>Diamondback brought Glean in to cut through M&amp;A-driven knowledge sprawl and give both office and field teams faster access to operational and technical context.</p>
+        </article>
+        <article class="story-card">
+          <span class="story-eyebrow">McCarthy Building Companies</span>
+          <h3>2 hrs/week saved per employee</h3>
+          <p>To replace a failed Copilot experiment, McCarthy rolled out Glean company-wide for 4k employees, with a focus on accelerating bid-to-build work. With 80% adoption, Glean is the most-adopted tool in the company.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell" aria-label="Why Glean">
+      <p class="eyebrow-red">Why Glean</p>
+      <h2>Why Glean?</h2>
+      <p class="section-intro">Patterson-UTI is facing a common enterprise AI challenge: demand is established, but usage is fragmented across sanctioned tools, limited-license environments, and shadow AI behaviors.</p>
+
+      <div class="why-grid">
+        <article class="why-card open">
+          <button class="accordion-toggle" type="button" aria-expanded="true">
+            <h3 class="why-title">Standardize AI Usage</h3>
+            <span class="accordion-icon" aria-hidden="true">−</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="why-content">
+                <p>Today, employee use of LLM assistants, whether in corporate Gemini licenses or unsanctioned tools, creates a fragmented operating environment for the business and a governance burden for IT. Glean gives Patterson-UTI a way to standardize that environment with one horizontal AI layer across the existing stack.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="why-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="why-title">Connect Enterprise Context</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="why-content">
+                <p>Patterson-UTI knowledge sits across field procedures, rig history, safety content, contracts, prior project work, and office systems. Glean connects that enterprise context with permissions intact so employees can retrieve the right answer faster and use it inside search, assistant, and agent workflows.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="why-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="why-title">Improve Output Quality and Adoption</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="why-content">
+                <p>Enterprise AI only becomes useful when outputs are grounded in real company context and easy for employees to trust. By pairing search, assistant, and agents with permission-aware enterprise knowledge, Glean improves answer quality and drives stronger day-to-day adoption than generic copilots alone.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="why-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="why-title">Give IT a Governed Foundation</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="why-content">
+                <p>Rather than adding another point solution, Glean gives IT a governed AI layer for search, assistant, and agents. That creates a durable foundation that can reduce tool sprawl, support future transformation, and improve time-to-answer across both field and office workflows.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell" aria-label="Departmental outcomes">
+      <p class="eyebrow-red">Departmental Outcomes</p>
+      <h2>Departmental Outcomes</h2>
+      <p class="section-intro">Compact cards by function, with the detailed bullets hidden until expanded.</p>
+
+      <div class="dept-grid">
+        <article class="dept-card open">
+          <button class="accordion-toggle" type="button" aria-expanded="true">
+            <h3 class="dept-title">Supply chain / procurement</h3>
+            <span class="accordion-icon" aria-hidden="true">−</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Faster access to contracts, renewals, terminations, vendor history, and prior work.</li>
+                  <li>Side-by-side comparison of vendor questionnaires and submittals with less manual effort.</li>
+                  <li>Better support for negotiation, vendor analysis, and procurement visibility across POs, invoices, and suppliers.</li>
+                  <li>Quantifiable outcomes can include 30–50% less time spent searching for internal information, faster procurement cycle times, and materially quicker answers to vendor and spend questions.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="dept-title">IT / digital</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Standardize governed AI usage across sanctioned tools instead of fragmented assistant experiences.</li>
+                  <li>Deflect internal support questions by making SOPs, system guidance, and internal know-how easier to find self-serve.</li>
+                  <li>Improve time-to-answer for everyday employee questions while keeping permissions, governance, and auditability intact.</li>
+                  <li>Reduce long-term tool sprawl by giving the company one enterprise layer for search, assistant, and agents.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="dept-title">Legal / compliance</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Faster access to approved language, precedent, contract history, and policy guidance.</li>
+                  <li>Support governed reuse of content so teams can start from the right language instead of stale local copies.</li>
+                  <li>Accelerate review cycles by reducing manual searching across documents, clauses, and prior negotiations.</li>
+                  <li>Lower risk from inconsistent wording and make compliance information easier to retrieve with permissions intact.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="dept-title">Field / operations</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Put SOPs, rig history, safety procedures, incident learnings, and prior project context in one place for faster retrieval.</li>
+                  <li>Reduce time spent chasing operational guidance across disconnected field and office systems.</li>
+                  <li>Help new employees ramp faster with easier access to the practical knowledge needed in the flow of work.</li>
+                  <li>Improve execution consistency by making trusted operating guidance easier to find and reuse.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="dept-title">HR / onboarding</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Give employees and managers one place to find policy, onboarding, and people-program information.</li>
+                  <li>Reduce repetitive SME questions and free up HR time from answering the same requests repeatedly.</li>
+                  <li>Help new hires ramp faster with better reinforcement of training, process updates, and internal resources.</li>
+                  <li>Provide permission-aware self-service answers without exposing sensitive HR content broadly.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dept-card">
+          <button class="accordion-toggle" type="button" aria-expanded="false">
+            <h3 class="dept-title">Finance / shared services</h3>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="dept-content">
+                <ul>
+                  <li>Make contracts, invoices, PO history, reporting definitions, and support documentation easier to retrieve.</li>
+                  <li>Reduce manual searching during planning, reporting, audit support, and exception handling workflows.</li>
+                  <li>Improve self-service answers for common internal requests across finance and shared services teams.</li>
+                  <li>Help teams move faster without adding another disconnected system for employees to learn.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.querySelectorAll('.why-card, .dept-card').forEach(function(card) {
+      const button = card.querySelector('.accordion-toggle');
+      const icon = card.querySelector('.accordion-icon');
+      button.addEventListener('click', function() {
+        const isOpen = card.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+        icon.textContent = isOpen ? '−' : '+';
+      });
+    });
+
+    if (window.GleanBridge && window.GleanBridge.postMessage && window.GleanBridge.onMessage) {
+      window.GleanBridge.postMessage({
+        actionId: 'export-pdf',
+        type: 'glean-add-menu',
+        metadata: { label: 'Export as PDF', icon: 'export' }
+      });
+      window.GleanBridge.onMessage('action', function(data) {
+        if (data.actionId === 'export-pdf') {
+          window.print();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
 
